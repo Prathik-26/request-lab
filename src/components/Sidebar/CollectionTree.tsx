@@ -17,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useActiveRequestStore } from "@/store/activeRequest";
 import { Input } from "@/components/ui/input";
 import type { Collection } from "@/types";
 
@@ -26,6 +27,8 @@ function CollectionItem({ collection }: { collection: Collection }) {
   const [renameValue, setRenameValue] = useState(collection.name);
 
   const allRequests = useCollectionStore((s) => s.requests);
+  const setRequest = useActiveRequestStore((s) => s.setRequest);
+
   const requests = allRequests.filter((r) => r.collectionId === collection.id);
   const { renameCollection, deleteCollection, saveRequest } =
     useCollectionStore();
@@ -45,8 +48,10 @@ function CollectionItem({ collection }: { collection: Collection }) {
   };
 
   const handleOpenRequest = async (requestId: string) => {
+    const req = requests.find((r) => r.id === requestId);
     await openTab(requestId);
     setActive(requestId);
+    if (req) setRequest(req);
   };
 
   return (
