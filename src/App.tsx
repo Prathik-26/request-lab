@@ -3,6 +3,7 @@ import { useTabStore } from "./store/tabs";
 import { useCollectionStore } from "./store/collections";
 import CollectionTree from "./components/Sidebar/CollectionTree";
 import TabBar from "./components/Sidebar/TabBar";
+import ResponsePanel from "./components/Response/ResponsePanel";
 import RequestPanel from "./components/Requests/RequestPanel";
 
 export default function App() {
@@ -22,11 +23,13 @@ export default function App() {
       </aside>
       <main className="flex flex-col flex-1 overflow-hidden">
         <TabBar />
-        <div className="flex-1 overflow-hidden">
-          <RequestPanel />
-        </div>
-        <div className="h-64 border-t border-zinc-800 p-4 bg-zinc-950">
-          <p className="text-xs text-zinc-600">Response viewer — Week 4</p>
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden border-b border-zinc-800">
+            <RequestPanel />
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <ResponsePanel />
+          </div>
         </div>
       </main>
     </div>

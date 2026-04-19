@@ -1,5 +1,7 @@
 import { useActiveRequestStore } from "@/store/activeRequest";
 import { useCollectionStore } from "@/store/collections";
+import { useResponseStore } from "@/store/response";
+import { sendRequest } from "@/lib/requester";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { HttpMethod } from "@/types";
@@ -17,6 +19,7 @@ const methodColor: Record<HttpMethod, string> = {
 export default function UrlBar() {
   const { request, updateField } = useActiveRequestStore();
   const saveRequest = useCollectionStore((s) => s.saveRequest);
+  const { setResponse, setLoading, setError, loading } = useResponseStore();
 
   if (!request)
     return (
@@ -28,13 +31,25 @@ export default function UrlBar() {
     );
 
   const handleSend = async () => {
+    if (!request.url) return;
+    setLoading(true);
     const updated = { ...request, updatedAt: Date.now() };
     await saveRequest(updated);
+    try {
+      const res = await sendRequest(
+        request.url,
+        request.method,
+        request.headers,
+        request.body,
+      );
+      setResponse(res);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Request failed");
+    }
   };
 
   return (
     <div className="flex items-center gap-2 p-3 border-b border-zinc-800">
-      {/* Method selector */}
       <select
         value={request.method}
         onChange={(e) => updateField("method", e.target.value as HttpMethod)}
@@ -47,7 +62,6 @@ export default function UrlBar() {
         ))}
       </select>
 
-      {/* URL input */}
       <Input
         value={request.url}
         onChange={(e) => updateField("url", e.target.value)}
@@ -55,13 +69,13 @@ export default function UrlBar() {
         className="flex-1 bg-zinc-800 border-zinc-700 text-sm h-8 font-mono"
       />
 
-      {/* Send button */}
       <Button
         onClick={handleSend}
         size="sm"
-        className="bg-green-600 hover:bg-green-500 text-white shrink-0"
+        disabled={loading || !request.url}
+        className="bg-green-600 hover:bg-green-500 text-white shrink-0 disabled:opacity-50"
       >
-        Send
+        {loading ? "Sending..." : "Send"}
       </Button>
     </div>
   );
