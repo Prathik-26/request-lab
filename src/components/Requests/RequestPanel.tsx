@@ -2,18 +2,17 @@ import { useState } from "react";
 import UrlBar from "./UrlBar";
 import HeadersEditor from "./HeadersEditor";
 import BodyEditor from "./BodyEditor";
+import ParamsEditor from "./ParamsEditor";
 
-const TABS = ["Headers", "Body"] as const;
+const TABS = ["Params", "Headers", "Body"] as const;
 type TabType = (typeof TABS)[number];
 
 export default function RequestPanel() {
-  const [activeTab, setActiveTab] = useState<TabType>("Headers");
+  const [activeTab, setActiveTab] = useState<TabType>("Params");
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <UrlBar />
-
-      {/* Sub-tabs */}
       <div className="flex border-b border-zinc-800 px-3 shrink-0">
         {TABS.map((tab) => (
           <button
@@ -30,9 +29,8 @@ export default function RequestPanel() {
           </button>
         ))}
       </div>
-
-      {/* Tab content */}
       <div className="flex-1 overflow-auto">
+        {activeTab === "Params" && <ParamsEditor />}
         {activeTab === "Headers" && <HeadersEditor />}
         {activeTab === "Body" && <BodyEditor />}
       </div>
